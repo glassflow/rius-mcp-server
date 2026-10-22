@@ -1,5 +1,7 @@
 # Rius MCP server
 
+[![Rius MCP connector](https://glama.ai/mcp/connectors/ai.glassflow/rius/badges/score.svg)](https://glama.ai/mcp/connectors/ai.glassflow/rius)
+
 [Rius](https://www.glassflow.ai/rius) is an observability platform for AI agents, built by GlassFlow. The Rius MCP server lets your coding assistant query your agents' traces, errors, cost and alerts in plain language, from VS Code (GitHub Copilot), Claude Code, Cursor, Codex or any other MCP client.
 
 This repository holds the public README for the hosted server, plus a reference copy of its `server.json`. The live registry entry is published by the server's release pipeline, so its `version` may be newer than the copy here. The server itself runs as a managed service; there is nothing to install or self-host.
