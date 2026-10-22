@@ -13,6 +13,7 @@
   ],
   "repository": {
     "url": "https://github.com/glassflow/rius-mcp-server",
-    "source": "github"
+    "source": "github",
+    "id": "1429366697"
   }
 }
