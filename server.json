@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.glassflow/rius",
+  "title": "Rius",
+  "description": "Query your AI agents' traces, errors, cost and alerts in Rius, the agent observability platform.",
+  "version": "0.11.2",
+  "websiteUrl": "https://docs.glassflow.ai/rius/mcp",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.eu.console.rius-glassflow.com/mcp"
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/glassflow/rius-mcp-server",
+    "source": "github",
+    "id": "1429366697"
+  }
+}
