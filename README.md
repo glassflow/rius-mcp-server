@@ -2,7 +2,7 @@
 
 [Rius](https://www.glassflow.ai/rius) is an observability platform for AI agents, built by GlassFlow. The Rius MCP server lets your coding assistant query your agents' traces, errors, cost and alerts in plain language, from VS Code (GitHub Copilot), Claude Code, Cursor, Codex or any other MCP client.
 
-This repository holds the public README and reference `server.json` for the hosted server. The server itself runs as a managed service; there is nothing to install or self-host.
+This repository holds the public README for the hosted server, plus a reference copy of its `server.json`. The live registry entry is published by the server's release pipeline, so its `version` may be newer than the copy here. The server itself runs as a managed service; there is nothing to install or self-host.
 
 - **Endpoint:** `https://mcp.eu.console.rius-glassflow.com/mcp`
 - **Transport:** Streamable HTTP
@@ -15,9 +15,9 @@ This repository holds the public README and reference `server.json` for the host
 Once connected, ask questions about your agents in the chat:
 
 - "Which of my agents had the most errors in the last 24 hours, and what are the top error groups?"
-- "Show me the slowest traces for `support-agent` today and walk me through the worst one."
+- "Show me today's failed runs for `support-agent` and walk me through the worst one."
 - "Compare cost and latency between versions 1.4.0 and 1.5.0 of `support-agent`."
-- "Which users ran the most sessions this week?"
+- "Which end users cost the most this week?"
 - "List open alerts and explain what triggered each one."
 - "Create an alert that fires when `checkout-agent` error rate goes above 5%."
 
@@ -27,7 +27,7 @@ A Rius workspace with agent traces in it. [Sign up](https://console.rius-glassfl
 
 ## Connect
 
-Every client below uses the server name `rius`. On first use the client opens a browser window to sign in to Rius; the server supports dynamic client registration and client ID metadata documents, so there is no client ID to configure.
+Every client below uses the server name `rius`. On first use the client signs you in to Rius through the browser (some clients need a command to start it; see the per-client notes). The server supports dynamic client registration and client ID metadata documents, so there is no client ID to configure.
 
 ### VS Code (GitHub Copilot)
 
@@ -44,7 +44,7 @@ Add the server to `.vscode/mcp.json` in your workspace (or your user `mcp.json`)
 }
 ```
 
-Then open Copilot Chat, switch to Agent mode and enable the `rius` tools.
+Start the server from the **Start** action above its entry in `mcp.json` (or run **MCP: List Servers**) and allow the sign-in prompt. Then open Copilot Chat, switch to Agent mode and select the `rius` tools.
 
 ### Claude Code
 
@@ -67,6 +67,8 @@ Add to `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project):
   }
 }
 ```
+
+Then approve the server under **Settings → MCP**.
 
 ### Codex
 
@@ -107,7 +109,31 @@ claude mcp add --transport http rius https://mcp.eu.console.rius-glassflow.com/m
   --header "Authorization: Bearer ${RIUS_API_KEY}"
 ```
 
-In JSON configs, add a `headers` block:
+In VS Code, let it prompt for the key once and store it securely:
+
+```json
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "rius-key",
+      "description": "Rius API key",
+      "password": true
+    }
+  ],
+  "servers": {
+    "rius": {
+      "type": "http",
+      "url": "https://mcp.eu.console.rius-glassflow.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:rius-key}"
+      }
+    }
+  }
+}
+```
+
+In other JSON configs, add a `headers` block. Not every client expands environment variables, so use your client's variable syntax or paste the key:
 
 ```json
 {
@@ -127,7 +153,7 @@ In Codex, set `bearer_token_env_var = "RIUS_API_KEY"` on the server entry in `~/
 
 ## Tools
 
-The server exposes 30 tools. The full reference with parameters is at https://docs.glassflow.ai/rius/mcp/tools.
+The main tools are below. The full, current reference with parameters is at https://docs.glassflow.ai/rius/mcp/tools.
 
 | Area | Tools |
 | --- | --- |
@@ -139,12 +165,10 @@ The server exposes 30 tools. The full reference with parameters is at https://do
 | Alerts (write) | `create_alert_rule`, `update_alert_rule`, `delete_alert_rule`, `create_alert_channel`, `update_alert_channel`, `delete_alert_channel`, `ack_alert` |
 | Keys (write) | `create_api_key` |
 
-Eight tools change data. The server tells the assistant when a call is not allowed, rather than failing silently:
+The tools marked "write" change data. When a call is not allowed, the server tells the assistant why instead of failing silently:
 
-- Alert rule tools need the `alerts:manage` permission, and alert channel tools need `channels:manage`.
-- `ack_alert` and `create_api_key` work only for a signed-in user, never with an API key.
-
-All other tools are read-only.
+- **Signed in:** read tools and `ack_alert` work for every member. Alert rule and channel tools, `list_alert_channels` and `create_api_key` need an org admin.
+- **With an API key:** a key is read-only unless it was created with `alerts:manage` (alert rule tools) or `channels:manage` (alert channel tools, including `list_alert_channels`). `ack_alert` and `create_api_key` never work with a key.
 
 ## Links
 
